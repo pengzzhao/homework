@@ -1,6 +1,5 @@
 package com.homework;
 
-import com.homework.entity.User;
 import com.homework.mapper.UserMapper;
 import org.junit.Assert;
 import org.junit.Test;
@@ -14,18 +13,18 @@ import java.util.List;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class HomeworkApplicationTests {
-
-    @Autowired
-    private UserMapper userMapper;
+//
+//    @Autowired
+//    private UserMapper userMapper;
 
     /**
      * 测试mybatis plus的集成
      */
     @Test
     public void testSelect() {
-        System.out.println(("----- selectAll method test ------"));
-        List<User> userList = userMapper.selectList(null);
-        Assert.assertEquals(1, userList.size());
-        userList.forEach(System.out::println);
+//        System.out.println(("----- selectAll method test ------"));
+//        List<User> userList = userMapper.selectList(null);
+//        Assert.assertEquals(1, userList.size());
+//        userList.forEach(System.out::println);
     }
 }

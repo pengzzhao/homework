@@ -3,35 +3,78 @@
 #### 项目介绍
 spring-boot-homework课堂作业
 
-#### 软件架构
-软件架构说明
+#### tag1
+完成springboot基本脚架，集成redis、mybatis-plus
+
+#### tag2
+完成首页内容显示，登录注册功能
+
+#### tag3
+完成首页侧边内容显示，文章分类，文章详情等功能
+
+#### tag4
+完成文章收藏，喜欢
 
 
-#### 安装教程
 
-1. xxxx
-2. xxxx
-3. xxxx
+### 数据库
+> 通用字段
 
-#### 使用说明
+id、created、modified
 
-1. xxxx
-2. xxxx
-3. xxxx
+> 用户基本表
 
-#### 参与贡献
+username
+password
+email
+mobile
+point积分
+gender性别
+wechat微信
+birthday生日
+avatar头像
+status状态
+lasted最后登录时间
 
-1. Fork 本项目
-2. 新建 Feat_xxx 分支
-3. 提交代码
-4. 新建 Pull Request
+postCount内容数量
+commentCount评论数量
 
 
-#### 码云特技
+> 文章详情表
 
-1. 使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2. 码云官方博客 [blog.gitee.com](https://blog.gitee.com)
-3. 你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解码云上的优秀开源项目
-4. [GVP](https://gitee.com/gvp) 全称是码云最有价值开源项目，是码云综合评定出的优秀开源项目
-5. 码云官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6. 码云封面人物是一档用来展示码云会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+title
+content
+editMode模式，html或md
+voteUp支持人数
+voteDown反对人数
+viewCount访问量
+level置顶等级（默认为0，等级越高越置顶）
+recommend是否精华
+status转态
+
+userId
+categoryId分类ID
+
+
+> 文章分类表
+
+name
+content
+summary
+icon
+postCount该分类的内容数量
+orderNum排序编码
+parentId上级分类ID
+metaKeywrods关键字SEO
+metaDescription关键描述内容SEO
+
+> 文章评论表
+
+content
+parentId回复评论的ID
+postId回复内容的ID
+userId回复用户ID
+voteUp“顶”的数量
+voteDown“踩”的数量
+level置顶等级
+status评论状态
