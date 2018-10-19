@@ -1,7 +1,6 @@
 package com.homework.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.homework.entity.BaseEntity;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.baomidou.mybatisplus.annotation.TableId;
 

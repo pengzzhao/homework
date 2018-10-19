@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.Map;
 
+/**
+ * 首页控制器
+ */
 @Slf4j
 @Controller
 public class IndexController extends BaseController{
@@ -22,16 +25,15 @@ public class IndexController extends BaseController{
         page.setSize(10);
 
         IPage<Map<String, Object>> pageData = postService.pageMaps(page, null);
+
+        //添加关联的用户信息
         userService.join(pageData, "user_id");
 
-        log.debug("--------------->" + pageData.getRecords());
 
         req.setAttribute("pageData", pageData);
 
-        System.out.println("-------------------------------" + page.getPages());
-        System.out.println(pageData.getRecords());
-
-        req.setAttribute("heihei", "hello world");
+        log.info("--------------->" + pageData.getRecords());
+        log.info("-------------------------------" + page.getPages());
 
         return "index";
     }

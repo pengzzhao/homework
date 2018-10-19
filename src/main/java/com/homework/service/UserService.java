@@ -16,5 +16,10 @@ import java.util.Map;
  */
 public interface UserService extends IService<User> {
 
+    /**
+     * 给关联用户的分页结果添加用户信息
+     * @param pageData
+     * @param linkfield
+     */
     void join(IPage<Map<String,Object>> pageData, String linkfield);
 }

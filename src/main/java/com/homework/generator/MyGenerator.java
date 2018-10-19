@@ -62,7 +62,7 @@ public class MyGenerator {
         // 字段名生成策略
         strategy.setNaming(NamingStrategy.underline_to_camel);
         // 自定义实体父类
-         strategy.setSuperEntityClass("com.homework.entity.BaseEntity");
+//         strategy.setSuperEntityClass("com.homework.entity.BaseEntity");
         // 自定义实体，公共字段
         strategy.setSuperEntityColumns(new String[]{"id,created,modified"});
         // 自定义 mapper 父类
