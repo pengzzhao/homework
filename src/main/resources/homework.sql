@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50717
 File Encoding         : 65001
 
-Date: 2018-10-19 17:35:37
+Date: 2018-10-19 19:51:05
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -137,10 +137,9 @@ CREATE TABLE `user` (
   `comment_count` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '评论数量',
   `status` tinyint(2) NOT NULL DEFAULT '0' COMMENT '状态',
   `lasted` datetime DEFAULT NULL COMMENT '最后的登陆时间',
-  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT '创建日期',
+  `created` datetime NOT NULL COMMENT '创建日期',
   `modified` datetime DEFAULT NULL COMMENT '最后修改时间',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `email` (`email`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
