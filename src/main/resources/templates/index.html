@@ -8,11 +8,12 @@
     <meta name="description" content="Fly社区是模块化前端UI框架Layui的官网社区，致力于为web开发提供强劲动力">
 
     <!--全局样式-->
-    <link th:include="static :: style" />
+    <link th:include="common/static :: style" />
 </head>
 <body>
 <!--头-->
-<div th:include="templates :: header"></div>
+<div th:include="common/templates :: header"></div>
+<div th:include="common/templates :: header-nav"></div>
 
 <div class="layui-container">
     <div class="layui-row layui-col-space15">
@@ -116,19 +117,19 @@
         </div>
         <div class="layui-col-md4">
             <!--签到-->
-            <div th:include="templates :: signin"></div>
+            <div th:include="common/templates :: signin"></div>
 
             <!--本周热议-->
-            <div th:include="templates :: weekPopular"></div>
+            <div th:include="common/templates :: weekPopular"></div>
 
             <!--广告与友情链接-->
-            <div th:include="templates :: ads"></div>
+            <div th:include="common/templates :: ads"></div>
 
         </div>
     </div>
 </div>
 
 <!--尾-->
-<div th:include="templates :: footer"></div>
+<div th:include="common/templates :: footer"></div>
 </body>
 </html>
