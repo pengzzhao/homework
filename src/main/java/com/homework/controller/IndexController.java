@@ -1,6 +1,7 @@
 package com.homework.controller;
 
 import cn.hutool.crypto.SecureUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.api.R;
@@ -24,6 +25,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -45,15 +47,24 @@ public class IndexController extends BaseController{
         page.setCurrent(1);
         page.setSize(10);
 
-        IPage<Map<String, Object>> pageData = postService.pageMaps(page, null);
+        IPage<Map<String, Object>> pageData = postService.pageMaps(page, new QueryWrapper<Post>().orderByDesc("created"));
 
         //添加关联的用户信息
         userService.join(pageData, "user_id");
+        categoryService.join(pageData, "category_id");
 
         req.setAttribute("pageData", pageData);
 
         log.info("--------------->" + pageData.getRecords());
         log.info("-------------------------------" + page.getPages());
+
+
+        //置顶文章（取5条）
+        List<Map<String, Object>> levelPosts = postService.listMaps(new QueryWrapper<Post>().orderByDesc("level").last(" limit 5 "));
+        userService.join(levelPosts, "user_id");
+        categoryService.join(levelPosts, "category_id");
+
+        req.setAttribute("levelPosts", levelPosts);
 
         return "index";
     }

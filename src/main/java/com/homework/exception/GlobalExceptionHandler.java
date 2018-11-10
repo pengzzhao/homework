@@ -38,4 +38,18 @@ public class GlobalExceptionHandler {
         return R.failed(e.getMessage());
     }
 
+    @ExceptionHandler(value = IllegalArgumentException.class)
+    public ModelAndView assertExceptionHandler(HttpServletRequest req, IllegalArgumentException e) throws Exception {
+
+        log.error("------------------>捕捉到assert异常", e);
+
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("msg", e.getMessage());
+        mav.addObject("url", req.getRequestURL());
+        mav.setViewName("error/500");
+        return mav;
+    }
+
+
+
 }

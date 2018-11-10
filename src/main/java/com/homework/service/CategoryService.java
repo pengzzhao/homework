@@ -11,6 +11,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @author lv-success
  * @since 2018-10-14
  */
-public interface CategoryService extends IService<Category> {
+public interface CategoryService extends BaseService<Category> {
 
 }

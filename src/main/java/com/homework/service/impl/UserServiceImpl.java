@@ -3,23 +3,22 @@ package com.homework.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.api.R;
 import com.homework.entity.User;
 import com.homework.mapper.UserMapper;
+import com.homework.service.CategoryService;
 import com.homework.service.UserService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.homework.shiro.AccountProfile;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,25 +31,10 @@ import java.util.Map;
  */
 @Slf4j
 @Service
-public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
+public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implements UserService {
 
-    @Override
-    public void join(IPage<Map<String, Object>> pageData, String linkfield) {
-        List<Map<String, Object>> records = pageData.getRecords();
-
-        records.forEach(map -> {
-            String userId = map.get(linkfield).toString();
-            User user = this.getById(userId);
-
-            Map<String, Object> author = new HashMap<>();
-            author.put("username", user.getUsername());
-            author.put("email", user.getEmail());
-            author.put("avatar", user.getAvatar());
-            author.put("id", user.getId());
-
-            map.put("author", author);
-        });
-    }
+    @Autowired
+    CategoryService categoryService;
 
     @Override
     public AccountProfile login(String email, String password) {
@@ -105,5 +89,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         po.setPoint(0);
 
         return this.save(po)? R.ok("") : R.failed("注册失败");
+    }
+
+    @Override
+    public void join(Map<String, Object> map, String field) {
+
+        Map<String, Object> joinColumns = new HashMap<>();
+        //字段的值
+        String linkfieldValue = map.get(field).toString();
+
+        User user = this.getById(linkfieldValue);
+
+        joinColumns.put("username", user.getUsername());
+        joinColumns.put("email", user.getEmail());
+        joinColumns.put("avatar", user.getAvatar());
+        joinColumns.put("id", user.getId());
+
+        map.put("author", joinColumns);
     }
 }
