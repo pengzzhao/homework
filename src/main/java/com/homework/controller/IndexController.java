@@ -138,4 +138,10 @@ public class IndexController extends BaseController{
         return r;
     }
 
+    @GetMapping("/user/logout")
+    public String logout() {
+        SecurityUtils.getSubject().logout();
+        return "redirect:/";
+    }
+
 }

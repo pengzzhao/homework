@@ -51,7 +51,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
         //更新最后登录时间
         user.setLasted(new Date());
-        user.updateById();
+        this.updateById(user);
 
         AccountProfile profile = new AccountProfile();
 

@@ -7,6 +7,7 @@ import com.homework.entity.Post;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,7 +35,7 @@ public class PostController extends BaseController{
 
         req.setAttribute("pageData", pageData);
         req.setAttribute("currentCategoryId", id);
-        return "category";
+        return "post/category";
     }
 
     @GetMapping("/post/{id}")
@@ -49,7 +50,20 @@ public class PostController extends BaseController{
         req.setAttribute("post", post);
         req.setAttribute("currentCategoryId", post.get("category_id"));
 
-        return "post";
+        return "post/index";
+    }
+
+    @GetMapping("/user/post")
+    public String getPost() {
+
+        String id = req.getParameter("id");
+        if(!StringUtils.isEmpty(id)) {
+            Post post = postService.getById(Long.valueOf(id));
+            if(post != null)
+                req.setAttribute("post", post);
+        }
+
+        return "post/add";
     }
 
 }
