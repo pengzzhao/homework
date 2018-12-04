@@ -23,6 +23,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * 公众号：java思维导图
+ */
 @Slf4j
 @Controller
 @RequestMapping("/user")
@@ -30,7 +33,7 @@ public class CenterController extends BaseController{
 
     @GetMapping("/center")
     public String center( @RequestParam(defaultValue = "1") Integer current,
-                          @RequestParam(defaultValue = "10")Integer size, String tab) {
+                          @RequestParam(defaultValue = "10")Integer size) {
 
         Page<Post> page = new Page<>();
         page.setCurrent(current);
@@ -39,14 +42,26 @@ public class CenterController extends BaseController{
         log.info("-------------->进入个人中心");
 
         QueryWrapper<Post> wrapper = new QueryWrapper<Post>().eq("user_id", getProfileId()).orderByDesc("created");
-        if(StrUtil.isNotBlank(tab)) {
-//            wrapper.eq();
-        }
 
         IPage<Map<String, Object>> pageData = postService.pageMaps(page, wrapper);
         req.setAttribute("pageData", pageData);
 
         return "user/center";
+    }
+
+    @GetMapping("/collection")
+    public String collection( @RequestParam(defaultValue = "1") Integer current,
+                          @RequestParam(defaultValue = "10")Integer size) {
+
+        Page<Post> page = new Page<>();
+        page.setCurrent(current);
+        page.setSize(size);
+
+
+        // TODO
+        req.setAttribute("pageData", new Page());
+
+        return "user/collection";
     }
 
     @ResponseBody
@@ -89,6 +104,19 @@ public class CenterController extends BaseController{
         return isSucc ? R.ok(user): R.failed("更新失败");
     }
 
+    /**
+     * 头像上传
+     *
+     * Constant.uploadDir是要上传的路径
+     * Constant.uploadUrl是我另一个tomcat的项目路径
+     * Constant.uploadDir对应的就是这个Constant.uploadUrl的访问路径。
+     *
+     * 可以通过另外部署一个tomcat或者nginx实现
+     * 当然了，上传到云存储服务器更好。
+     *
+     * @param file
+     * @return
+     */
     @ResponseBody
     @PostMapping("/upload")
     public R upload(@RequestParam(value = "file") MultipartFile file) {
@@ -117,7 +145,7 @@ public class CenterController extends BaseController{
             log.info("上传成功后的文件路径未：" + filePath + fileName);
 
             String path = filePath + fileName;
-            String url = "http://localhost:10080/upload/" + fileName;
+            String url = Constant.uploadUrl + fileName;
 
             log.info("url ---> {}", url);
 
