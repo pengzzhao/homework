@@ -37,8 +37,10 @@ layui.define('fly', function(exports){
     }
   });
 
+    console.log("222222222");
+
   //提交回答
-  fly.form['/jie/reply/'] = function(data, required){
+  fly.form['/user/post/comment'] = function(data, required){
     var tpl = '<li>\
       <div class="detail-about detail-about-reply">\
         <a class="fly-avatar" href="/u/{{ layui.cache.user.uid }}" target="_blank">\
@@ -76,11 +78,11 @@ layui.define('fly', function(exports){
     del: function(div){
       layer.confirm('确认删除该求解么？', function(index){
         layer.close(index);
-        fly.json('/api/jie-delete/', {
+        fly.json('/user/post/delete', {
           id: div.data('id')
         }, function(res){
-          if(res.status === 0){
-            location.href = '/jie/';
+          if(res.code === 0){
+            location.href = '/';
           } else {
             layer.msg(res.msg);
           }
@@ -105,8 +107,8 @@ layui.define('fly', function(exports){
     //收藏
     ,collect: function(div){
       var othis = $(this), type = othis.data('type');
-      fly.json('/collection/'+ type +'/', {
-        cid: div.data('id')
+      fly.json('/user/post/collection/'+ type +'/', {
+        postId: div.data('id')
       }, function(res){
         if(type === 'add'){
           othis.data('type', 'remove').html('取消收藏').addClass('layui-btn-danger');
@@ -127,9 +129,10 @@ layui.define('fly', function(exports){
     var div = $('.fly-admin-box'), jieAdmin = $('#LAY_jieAdmin');
     //查询帖子是否收藏
     if(jieAdmin[0] && layui.cache.user.uid != -1){
-      fly.json('/collection/find/', {
-        cid: div.data('id')
+      fly.json('/user/post/collection/find', {
+        postId: div.data('id')
       }, function(res){
+        console.log("--------------")
         jieAdmin.append('<span class="layui-btn layui-btn-xs jie-admin '+ (res.data.collection ? 'layui-btn-danger' : '') +'" type="collect" data-type="'+ (res.data.collection ? 'remove' : 'add') +'">'+ (res.data.collection ? '取消收藏' : '收藏') +'</span>');
       });
     }

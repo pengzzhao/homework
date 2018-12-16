@@ -94,7 +94,10 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     @Override
     public void join(Map<String, Object> map, String field) {
 
+        if(map == null || map.get(field) == null) return;
+
         Map<String, Object> joinColumns = new HashMap<>();
+
         //字段的值
         String linkfieldValue = map.get(field).toString();
 

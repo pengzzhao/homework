@@ -1,14 +1,18 @@
 package com.homework.controller;
 
+import cn.hutool.core.map.MapUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.homework.entity.Category;
+import com.homework.entity.Comment;
 import com.homework.entity.Post;
+import com.homework.entity.UserCollection;
 import com.homework.utils.Constant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
@@ -113,6 +117,120 @@ public class PostController extends BaseController{
         //TODO 给所有订阅的人发送消息
 
         return R.ok(post.getId());
+    }
+
+    @ResponseBody
+    @Transactional
+    @PostMapping("/user/post/delete")
+    public R postDelete(Long id) {
+        Post post = postService.getById(id);
+
+        Assert.isTrue(post != null, "该帖子已被删除");
+
+        Long profileId = getProfileId();
+        if(post.getUserId() != profileId) {
+            return R.failed("不是删除非自己的帖子");
+        }
+
+        postService.removeById(id);
+
+        // 同时删除所有的相关收藏
+        userCollectionService.removeByMap(MapUtil.of("post_id", id));
+
+        return R.ok(null);
+    }
+
+    /**
+     * 判断是否收藏
+     * @param postId
+     * @return
+     */
+    @ResponseBody
+    @PostMapping("/user/post/collection/find")
+    public R collectionFind(String postId) {
+        int count = userCollectionService.count(new QueryWrapper<UserCollection>()
+                .eq("post_id", postId)
+                .eq("user_id", getProfileId()));
+
+        return R.ok(MapUtil.of("collection", count > 0));
+    }
+
+    /**
+     * 收藏
+     * @param postId
+     * @return
+     */
+    @ResponseBody
+    @PostMapping("/user/post/collection/add")
+    public R collectionAdd(Long postId) {
+
+        Post post = postService.getById(postId);
+
+        Assert.isTrue(post != null, "该帖子已被删除");
+
+        int count = userCollectionService.count(new QueryWrapper<UserCollection>()
+                .eq("post_id", postId)
+                .eq("user_id", getProfileId()));
+
+        if(count > 0) {
+            return R.failed("你已经收藏");
+        }
+
+        UserCollection collection = new UserCollection();
+        collection.setUserId(getProfileId());
+        collection.setCreated(new Date());
+        collection.setModified(new Date());
+
+        collection.setPostId(post.getId());
+        collection.setPostUserId(post.getUserId());
+
+        userCollectionService.save(collection);
+
+        return R.ok(MapUtil.of("collection", true));
+    }
+
+    /**
+     * 取消收藏
+     * @param postId
+     * @return
+     */
+    @ResponseBody
+    @PostMapping("/user/post/collection/remove")
+    public R collectionRemove(String postId) {
+
+        Post post = postService.getById(Long.valueOf(postId));
+
+        Assert.isTrue(post != null, "该帖子已被删除");
+
+        boolean hasRemove = userCollectionService.remove(new QueryWrapper<UserCollection>()
+                .eq("post_id", postId)
+                .eq("user_id", getProfileId()));
+
+        return R.ok(hasRemove);
+    }
+
+    @ResponseBody
+    @PostMapping("/user/post/comment")
+    public R commentAdd(@Valid Comment comment, BindingResult bindingResult) {
+
+        if(bindingResult.hasErrors()) {
+            return R.failed(bindingResult.getFieldError().getDefaultMessage());
+        }
+
+        Post post = postService.getById(comment.getPostId());
+        Assert.isTrue(post != null, "该帖子已被删除");
+
+        comment.setUserId(getProfileId());
+        comment.setCreated(new Date());
+        comment.setModified(new Date());
+        comment.setStatus(Constant.NORMAL_STATUS);
+        commentService.save(comment);
+
+        // TODO 记录动作
+
+        // TODO 通知作者
+
+        return R.ok(null);
     }
 
 }

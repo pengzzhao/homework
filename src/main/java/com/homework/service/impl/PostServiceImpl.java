@@ -27,7 +27,7 @@ public class PostServiceImpl extends BaseServiceImpl<PostMapper, Post> implement
     public void join(Map<String, Object> map, String field) {
         Map<String, Object> joinColumns = new HashMap<>();
 
-        if(map.get(field) == null) {
+        if(map == null || map.get(field) == null) {
             return;
         }
 
@@ -35,6 +35,8 @@ public class PostServiceImpl extends BaseServiceImpl<PostMapper, Post> implement
         String linkfieldValue = map.get(field).toString();
 
         Post post = this.getById(linkfieldValue);
+
+        if(post == null) return;
 
         joinColumns.put("id", post.getId());
         joinColumns.put("title", post.getTitle());
