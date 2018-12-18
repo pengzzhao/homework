@@ -67,14 +67,14 @@ public class PostController extends BaseController{
         page.setCurrent(current);
         page.setSize(size);
 
-        IPage<Map<String, Object>> dataPage = commentService.pageMaps(page, new QueryWrapper<Comment>()
+        IPage<Map<String, Object>> pageData = commentService.pageMaps(page, new QueryWrapper<Comment>()
                 .eq("post_id", id)
                 .orderByDesc("created"));
 
-        userService.join(dataPage, "user_id");
-        commentService.join(dataPage, "parent_id");
+        userService.join(pageData, "user_id");
+        commentService.join(pageData, "parent_id");
 
-        req.setAttribute("pageData", dataPage);
+        req.setAttribute("pageData", pageData);
 
         return "post/index";
     }
