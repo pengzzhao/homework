@@ -275,7 +275,7 @@ layui.define(['laypage', 'fly', 'element', 'flow'], function(exports){
       fly.json('/api/unbind', {
         type: type
       }, function(res){
-        if(res.status === 0){
+        if(res.code === 0){
           layer.alert('已成功解绑。', {
             icon: 1
             ,end: function(){

@@ -48,7 +48,9 @@ public class PostController extends BaseController{
     }
 
     @GetMapping("/post/{id}")
-    public String index(@PathVariable Long id) {
+    public String index(@PathVariable Long id,
+                        @RequestParam(defaultValue = "1") Integer current,
+                        @RequestParam(defaultValue = "10")Integer size) {
 
         Map<String, Object> post = postService.getMap(new QueryWrapper<Post>().eq("id", id));
 
@@ -59,6 +61,20 @@ public class PostController extends BaseController{
 
         req.setAttribute("post", post);
         req.setAttribute("currentCategoryId", post.get("category_id"));
+
+
+        Page<Comment> page = new Page<>();
+        page.setCurrent(current);
+        page.setSize(size);
+
+        IPage<Map<String, Object>> dataPage = commentService.pageMaps(page, new QueryWrapper<Comment>()
+                .eq("post_id", id)
+                .orderByDesc("created"));
+
+        userService.join(dataPage, "user_id");
+        commentService.join(dataPage, "parent_id");
+
+        req.setAttribute("pageData", dataPage);
 
         return "post/index";
     }
@@ -233,4 +249,20 @@ public class PostController extends BaseController{
         return R.ok(null);
     }
 
+    @ResponseBody
+    @PostMapping("/user/post/comment/delete")
+    public R commentDel(Long id) {
+
+        Comment comment = commentService.getById(id);
+
+        Assert.isTrue(comment!= null, "改评论已被删除");
+
+        if(comment.getUserId() != getProfileId()) {
+            return R.failed("删除失败！");
+        }
+
+        commentService.removeById(id);
+
+        return R.ok(null);
+    }
 }
