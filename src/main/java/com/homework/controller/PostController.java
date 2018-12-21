@@ -247,7 +247,7 @@ public class PostController extends BaseController{
         postService.saveOrUpdate(post);
 
         //更新首页排版版的评论数量
-        redisUtil.incrZsetValueAndUnionForLastWeekRank(comment.getPostId());
+        postService.incrZsetValueAndUnionForLastWeekRank(comment.getPostId());
 
         // TODO 记录动作
 

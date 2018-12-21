@@ -13,6 +13,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface PostService extends BaseService<Post> {
 
+    public void incrZsetValueAndUnionForLastWeekRank(Long postId);
+
+    public void zUnionAndStoreLast7DaysForLastWeekRank();
+
     public void initIndexWeekRank();
 
 }

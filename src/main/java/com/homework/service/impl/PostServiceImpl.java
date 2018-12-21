@@ -13,10 +13,7 @@ import com.homework.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>
@@ -55,6 +52,41 @@ public class PostServiceImpl extends BaseServiceImpl<PostMapper, Post> implement
     }
 
     /**
+     * 给set里的文章评论加1，并且重新union7天的评论数量
+     * @param postId
+     */
+    public void incrZsetValueAndUnionForLastWeekRank(Long postId) {
+        String dayRank = "day_rank:" + DateUtil.format(new Date(), DatePattern.PURE_DATE_PATTERN);
+        //文章阅读加一
+        redisUtil.zIncrementScore(dayRank, postId, 1);
+
+
+        this.hashCachePostIdAndTitle(this.getById(postId));
+
+        //重新union最近7天
+        this.zUnionAndStoreLast7DaysForLastWeekRank();
+    }
+
+    /**
+     * 把最近7天的文章评论数量统计一下
+     * 用于首页的7天评论排行榜
+     */
+    public void zUnionAndStoreLast7DaysForLastWeekRank() {
+        String prifix = "day_rank:";
+
+        List<String> keys  = new ArrayList<>();
+        String key = prifix + DateUtil.format(new Date(), DatePattern.PURE_DATE_PATTERN);
+
+        for(int i = -7 ; i < 0; i++) {
+            Date date = DateUtil.offsetDay(new Date(), i).toJdkDate();
+            keys.add(prifix + DateUtil.format(date, DatePattern.PURE_DATE_PATTERN));
+        }
+
+        redisUtil.zUnionAndStore(key, keys, "last_week_rank");
+    }
+
+
+    /**
      * 初始化首页的周评论排行榜
      */
     @Override
@@ -75,14 +107,26 @@ public class PostServiceImpl extends BaseServiceImpl<PostMapper, Post> implement
             redisUtil.zSet(key, post.getId(), post.getCommentCount());
 
             //缓存文章基本信息（hash结构）
-            redisUtil.hset("rank_post_" + post.getId(), "post:id", post.getId(), expireTime);
-            redisUtil.hset("rank_post_" + post.getId(), "post:title", post.getTitle(), expireTime);
-            //redisUtil.hset("rank_post_" + post.getId(), "post:comment_count", post.getCommentCount(), expireTime);
+            this.hashCachePostIdAndTitle(post);
 
             redisUtil.expire(key, expireTime);
         }
 
         //7天阅读相加。
-        redisUtil.zUnionAndStoreLast7DaysForLastWeekRank();
+        this.zUnionAndStoreLast7DaysForLastWeekRank();
+    }
+
+    private void hashCachePostIdAndTitle(Post post) {
+
+        boolean isExist = redisUtil.hasKey("rank_post_" + post.getId());
+        if(!isExist) {
+            long between = DateUtil.between(new Date(), post.getCreated(), DateUnit.DAY);
+            long expireTime = (7 - between) * 24 * 60 * 60;
+
+            //缓存文章基本信息（hash结构）
+            redisUtil.hset("rank_post_" + post.getId(), "post:id", post.getId(), expireTime);
+            redisUtil.hset("rank_post_" + post.getId(), "post:title", post.getTitle(), expireTime);
+            //redisUtil.hset("rank_post_" + post.getId(), "post:comment_count", post.getCommentCount(), expireTime);
+        }
     }
 }
