@@ -1,6 +1,7 @@
 package com.homework.config;
 
 import com.homework.service.CategoryService;
+import com.homework.service.PostService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -20,6 +21,9 @@ public class ContextStartup implements ApplicationRunner, ServletContextAware {
 
     @Autowired
     CategoryService categoryService;
+    @Autowired
+    PostService postService;
+
 
     @Override
     public void setServletContext(ServletContext servletContext) {
@@ -31,5 +35,9 @@ public class ContextStartup implements ApplicationRunner, ServletContextAware {
         servletContext.setAttribute("categorys", categoryService.list(null));
 
         log.info("ContextStartup------------>加载categorys");
+
+        //初始化首页的周评论排行榜
+        postService.initIndexWeekRank();
+
     }
 }

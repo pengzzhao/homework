@@ -1,12 +1,13 @@
 package com.homework.utils;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -560,4 +561,87 @@ public class RedisUtil {
             return 0;
         }
     }
+
+    //================有序集合 sort set===================
+    /**
+     * 有序set添加元素
+     *
+     * @param key
+     * @param value
+     * @param score
+     * @return
+     */
+    public boolean zSet(String key, Object value, double score) {
+        return redisTemplate.opsForZSet().add(key, value, score);
+    }
+
+    public long batchZSet(String key, Set<ZSetOperations.TypedTuple> typles) {
+        return redisTemplate.opsForZSet().add(key, typles);
+    }
+
+    public void incrZsetValue(String key, Object value, long delta) {
+        redisTemplate.opsForZSet().incrementScore(key, value, delta);
+    }
+
+    public void zUnionAndStore(String key, Collection otherKeys, String destKey) {
+        redisTemplate.opsForZSet().unionAndStore(key, otherKeys, destKey);
+    }
+
+    /**
+     * 给set里的文章评论加1，并且重新union7天的评论数量
+     * @param postId
+     */
+    public void incrZsetValueAndUnionForLastWeekRank(Object postId) {
+        String dayRank = "day_rank:" + DateUtil.format(new Date(), DatePattern.PURE_DATE_PATTERN);
+        redisTemplate.opsForZSet().incrementScore(dayRank, postId, 1);
+
+        //重新union最近7天
+        this.zUnionAndStoreLast7DaysForLastWeekRank();
+    }
+
+    /**
+     * 把最近7天的文章评论数量统计一下
+     * 用于首页的7天评论排行榜
+     */
+    public void zUnionAndStoreLast7DaysForLastWeekRank() {
+        String prifix = "day_rank:";
+
+        List<String> keys  = new ArrayList<>();
+        String key = prifix + DateUtil.format(new Date(), DatePattern.PURE_DATE_PATTERN);
+
+        for(int i = -7 ; i < 0; i++) {
+            Date date = DateUtil.offsetDay(new Date(), i).toJdkDate();
+            keys.add(prifix + DateUtil.format(date, DatePattern.PURE_DATE_PATTERN));
+        }
+
+        redisTemplate.opsForZSet().unionAndStore(key, keys, "last_week_rank");
+    }
+
+    /**
+     * 获取zset数量
+     * @param key
+     * @param value
+     * @return
+     */
+    public long getZsetScore(String key, Object value) {
+        Double score = redisTemplate.opsForZSet().score(key, value);
+        if(score==null){
+            return 0;
+        }else{
+            return score.longValue();
+        }
+    }
+
+    /**
+     * 获取有序集 key 中成员 member 的排名 。
+     * 其中有序集成员按 score 值递减 (从大到小) 排序。
+     * @param key
+     * @param start
+     * @param end
+     * @return
+     */
+    public Set<ZSetOperations.TypedTuple> getZSetRank(String key, long start, long end) {
+        return redisTemplate.opsForZSet().reverseRangeWithScores(key, start, end);
+    }
+
 }
