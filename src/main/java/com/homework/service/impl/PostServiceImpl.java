@@ -105,17 +105,21 @@ public class PostServiceImpl extends BaseServiceImpl<PostMapper, Post> implement
 
             //缓存文章到set中，评论数量作为排行标准
             redisUtil.zSet(key, post.getId(), post.getCommentCount());
+            //设置有效期
+            redisUtil.expire(key, expireTime);
 
             //缓存文章基本信息（hash结构）
             this.hashCachePostIdAndTitle(post);
-
-            redisUtil.expire(key, expireTime);
         }
 
         //7天阅读相加。
         this.zUnionAndStoreLast7DaysForLastWeekRank();
     }
 
+    /**
+     * hash结构缓存文章标题和id
+     * @param post
+     */
     private void hashCachePostIdAndTitle(Post post) {
 
         boolean isExist = redisUtil.hasKey("rank_post_" + post.getId());
