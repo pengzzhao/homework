@@ -1,0 +1,16 @@
+# DataSource Config
+server:
+  port: 80
+spring:
+  application:
+    name: hw-gatway
+eureka:
+  client:
+    service-url:
+      defaultZone: http://admin:admin@localhost:8761/eureka/
+# 路由规则配置
+zuul:
+  routes:
+    hw-blog:
+      path: /**
+      serviceId: hw-blog
