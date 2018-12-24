@@ -14,3 +14,9 @@ zuul:
     hw-blog:
       path: /**
       serviceId: hw-blog
+# 访问http://localhost/actuator/routes不报404
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
