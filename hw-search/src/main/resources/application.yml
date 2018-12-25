@@ -7,7 +7,7 @@ spring:
   data:
     elasticsearch:
       cluster-name: kobe
-      cluster-nodes: 47.106.38.101:9300
+      cluster-nodes: 127.0.0.1:9300
       repositories:
         enabled: true
 eureka:

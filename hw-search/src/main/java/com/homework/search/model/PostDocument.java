@@ -17,7 +17,7 @@ public class PostDocument implements Serializable {
     @Field(type = FieldType.keyword)
     private Long id;
 
-    @Field(type = FieldType.text, searchAnalyzer = "ik", analyzer = "ik")
+    @Field(type = FieldType.text)
     private String title;
 
     private Long authorId;
